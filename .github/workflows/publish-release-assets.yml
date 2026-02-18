@@ -133,10 +133,12 @@ jobs:
             # Configure git credentials securely using credential helper
             # This keeps the token out of the command line and git URLs
             git config --global credential.helper 'cache --timeout=300'
-            echo "protocol=https
+            git credential approve <<EOF
+protocol=https
 host=github.com
 username=x-access-token
-password=${GH_TOKEN}" | git credential approve
+password=${GH_TOKEN}
+EOF
 
             # Push the tag using standard remote (credentials from helper)
             git push origin "${TAG_NAME}"
