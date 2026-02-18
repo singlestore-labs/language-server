@@ -76,7 +76,7 @@ jobs:
 
             # Download the asset
             echo "Downloading asset: $safe_name from $url"
-            curl -L -H "Authorization: token ${GH_TOKEN}" -H "Accept: application/octet-stream" \
+            curl -L -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/octet-stream" \
               -o "release_assets/$safe_name" "$url"
           done
 
@@ -108,6 +108,8 @@ jobs:
             echo "Tag ${TAG_NAME} already exists locally"
           else
             # Create lightweight tag pointing to current HEAD
+            # Note: This tag represents the state of the release workflow repository,
+            # not the source repository. The tag is used as a reference point for the release.
             git tag "${TAG_NAME}"
             git push origin "${TAG_NAME}"
           fi
@@ -129,7 +131,10 @@ jobs:
           # Upload assets if any exist
           if [ -d "release_assets" ] && [ "$(ls -A release_assets)" ]; then
             echo "Uploading assets..."
-            gh release upload "${TAG_NAME}" release_assets/*
+            # Upload each file individually to handle filenames with special characters
+            find release_assets -type f -print0 | while IFS= read -r -d '' file; do
+              gh release upload "${TAG_NAME}" "$file"
+            done
           else
             echo "No assets to upload"
           fi
