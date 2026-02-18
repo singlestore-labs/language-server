@@ -42,7 +42,7 @@ The implementation includes multiple security measures:
 
 ### Git Push Authentication Issue
 - **Problem**: When pushing tags, git would fail with "could not read Username for 'https://github.com'" because HTTPS authentication wasn't configured
-- **Solution**: Changed to use token-authenticated URL format (`https://x-access-token:${GH_TOKEN}@github.com/${repo}.git`) for pushing tags, which provides authentication inline
+- **Solution**: Configured git credential helper to securely provide authentication using the GitHub token, avoiding exposing the token in command-line arguments or URLs
 
 ## Setup Required
 
