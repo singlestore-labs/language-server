@@ -28,11 +28,17 @@ Complete documentation covering:
 The implementation includes multiple security measures:
 
 1. **Input Validation**: Tag names are validated to prevent command injection
-2. **URL Validation**: Asset URLs are validated to prevent SSRF attacks
+2. **Asset ID Validation**: Asset IDs are validated to be numeric to prevent injection attacks
 3. **Filename Sanitization**: Filenames are sanitized to prevent path traversal
 4. **No eval**: Uses array-based command construction instead of eval
-5. **Bearer Token Auth**: Uses modern GitHub API authentication
+5. **Bearer Token Auth**: Uses modern GitHub API authentication via `gh api`
 6. **Safe File Handling**: Uses null-delimited find output for special characters
+
+## Bug Fixes
+
+### v0.0.4 - Empty File Upload Issue
+- **Problem**: Release assets were uploaded as empty files because the workflow was using `browser_download_url` with API authentication, which doesn't download files correctly
+- **Solution**: Changed to use GitHub API asset endpoint with asset IDs (`repos/owner/repo/releases/assets/{id}`) via `gh api` command with proper `Accept: application/octet-stream` header
 
 ## Setup Required
 
