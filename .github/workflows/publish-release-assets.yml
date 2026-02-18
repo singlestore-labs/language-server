@@ -63,11 +63,11 @@ jobs:
           # Get all assets from the release
           gh api repos/singlestore/language-server/releases/tags/${TAG_NAME} > release_info.json
 
-          # Extract asset information - get name and browser_download_url
+          # Extract asset information - get name and asset id
           # GitHub automatically creates "Source code (zip)" and "Source code (tar.gz)" assets
           # We need to exclude these by checking the name pattern
-          jq -r '.assets[] | "\(.name)|\(.browser_download_url)"' release_info.json | \
-          while IFS='|' read -r name url; do
+          jq -r '.assets[] | "\(.name)|\(.id)"' release_info.json | \
+          while IFS='|' read -r name asset_id; do
             # Skip assets that look like source code archives
             if [[ "$name" =~ ^Source[[:space:]]code[[:space:]]\((zip|tar\.gz)\)$ ]]; then
               echo "Skipping auto-generated source code archive: $name"
@@ -81,16 +81,17 @@ jobs:
               continue
             fi
 
-            # Validate URL is from GitHub (prevent SSRF)
-            if ! [[ "$url" =~ ^https://(api\.github\.com|github\.com)/ ]]; then
-              echo "Warning: Skipping asset with non-GitHub URL: $url"
+            # Validate asset_id is numeric
+            if ! [[ "$asset_id" =~ ^[0-9]+$ ]]; then
+              echo "Warning: Skipping asset with invalid ID: $asset_id"
               continue
             fi
 
-            # Download the asset
-            echo "Downloading asset: $safe_name from $url"
-            curl -L -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/octet-stream" \
-              -o "release_assets/$safe_name" "$url"
+            # Download the asset using the GitHub API endpoint with asset ID
+            echo "Downloading asset: $safe_name (ID: $asset_id)"
+            gh api -H "Accept: application/octet-stream" \
+              "repos/singlestore/language-server/releases/assets/${asset_id}" \
+              > "release_assets/$safe_name"
           done
 
           # Clean up
