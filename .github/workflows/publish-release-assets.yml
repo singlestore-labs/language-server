@@ -125,7 +125,13 @@ jobs:
             # Note: This tag represents the state of the release workflow repository,
             # not the source repository. The tag is used as a reference point for the release.
             git tag "${TAG_NAME}"
-            git push origin "${TAG_NAME}"
+
+            # Configure git to use GitHub token for authentication
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git config --global user.name "github-actions[bot]"
+
+            # Push the tag using authenticated URL
+            git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git "${TAG_NAME}"
           fi
 
           # Create release with options (avoiding eval for security)
