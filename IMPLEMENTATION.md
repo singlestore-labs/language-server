@@ -40,6 +40,10 @@ The implementation includes multiple security measures:
 - **Problem**: Release assets were uploaded as empty files because the workflow was using `browser_download_url` with API authentication, which doesn't download files correctly
 - **Solution**: Changed to use GitHub API asset endpoint with asset IDs (`repos/owner/repo/releases/assets/{id}`) via `gh api` command with proper `Accept: application/octet-stream` header
 
+### Git Push Authentication Issue
+- **Problem**: When pushing tags, git would fail with "could not read Username for 'https://github.com'" because HTTPS authentication wasn't configured
+- **Solution**: Configured git credential helper to securely provide authentication using the GitHub token, avoiding exposing the token in command-line arguments or URLs
+
 ## Setup Required
 
 Before the workflow can be used, you need to configure one secret:
