@@ -26,6 +26,13 @@ jobs:
           GH_TOKEN: ${{ secrets.SOURCE_REPO_TOKEN }}
           TAG_NAME: ${{ github.event.inputs.tag_name || github.event.client_payload.tag_name }}
         run: |
+          # Validate tag name format (alphanumeric, dots, hyphens, underscores, and forward slashes only)
+          if ! [[ "$TAG_NAME" =~ ^[a-zA-Z0-9._/-]+$ ]]; then
+            echo "Error: Invalid tag name format: ${TAG_NAME}"
+            echo "Tag name must contain only alphanumeric characters, dots, hyphens, underscores, and forward slashes"
+            exit 1
+          fi
+
           # Fetch release information from singlestore/language-server
           echo "Fetching release info for tag: ${TAG_NAME}"
 
@@ -62,7 +69,7 @@ jobs:
           jq -r '.assets[] | "\(.name)|\(.browser_download_url)"' release_info.json | \
           while IFS='|' read -r name url; do
             # Skip assets that look like source code archives
-            if [[ "$name" =~ ^Source\ code\ \((zip|tar\.gz)\)$ ]]; then
+            if [[ "$name" =~ ^Source[[:space:]]code[[:space:]]\((zip|tar\.gz)\)$ ]]; then
               echo "Skipping auto-generated source code archive: $name"
               continue
             fi
@@ -71,6 +78,12 @@ jobs:
             safe_name=$(basename "$name")
             if [[ "$safe_name" != "$name" ]] || [[ "$safe_name" == *".."* ]]; then
               echo "Warning: Skipping asset with unsafe name: $name"
+              continue
+            fi
+
+            # Validate URL is from GitHub (prevent SSRF)
+            if ! [[ "$url" =~ ^https://(api\.github\.com|github\.com)/ ]]; then
+              echo "Warning: Skipping asset with non-GitHub URL: $url"
               continue
             fi
 
