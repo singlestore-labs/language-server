@@ -88,6 +88,7 @@ Provide connection details under `initializationOptions.database`:
 | Port       | `port`       | integer | yes      | MySQL-protocol port (typically `3306`) |
 | Username   | `username`   | string  | yes      | Database user with at least read access to the schemas that should be completed |
 | Password   | `password`   | string  | yes      | Password for the database user |
+| Database   | `database`   | string  | no       | Default database |
 | SSL        | `ssl`        | boolean | no       | When `true`, the connection will use TLS. Defaults to `false` |
 
 ### Client Information
@@ -116,6 +117,7 @@ Provide the name and version of the language client under `initializationOptions
         "port": 3306,
         "username": "root",
         "password": "s3cret",
+        "database": "mydb",
         "ssl": false
       },
       "client": {
