@@ -73,6 +73,12 @@ The grammar directory must contain two binary files:
 - `ddl.bin` — compiled DDL grammar
 - `dml.bin` — compiled DML grammar
 
+## Official Clients
+
+| Client | Platform | Marketplace | Repository |
+|--------|----------|-------------|------------|
+| SingleStore VS Code | VS Code | [Extension](https://marketplace.visualstudio.com/items?itemName=singlestore.singlestore-vscode&ssr=false#overview) | [GitHub](https://github.com/singlestore-labs/singlestore-vscode) |
+
 ## Client Requirements
 
 Language server clients **must** supply two groups of parameters inside `initializationOptions` when sending the [`initialize`](https://microsoft.github.io/language-server-protocol/specifications/specification-3-14/#initialize) request.
