@@ -78,6 +78,7 @@ The grammar directory must contain two binary files:
 | Client | Platform | Marketplace | Repository |
 |--------|----------|-------------|------------|
 | SingleStore VS Code | VS Code | [Extension](https://marketplace.visualstudio.com/items?itemName=singlestore.singlestore-vscode&ssr=false#overview) | [GitHub](https://github.com/singlestore-labs/singlestore-vscode) |
+| SingleStore Vim | Vim 8+ / Neovim | | [GitHub](https://github.com/singlestore-labs/singlestore-vim) |
 
 ## Client Requirements
 
