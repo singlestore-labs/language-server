@@ -1,6 +1,6 @@
 # SingleStore SQL Language Server
 
-An LSP server for SingleStore SQL providing context-aware code completion and semantic syntax highlighting. Communicates over TCP using JSON-RPC 2.0.
+An LSP server for SingleStore SQL providing context-aware code completion and semantic syntax highlighting. Communicates using JSON-RPC 2.0 over TCP or WebSocket protocols.
 
 ## Installation
 
@@ -42,24 +42,66 @@ s2-language-server [flags]
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `-addr` | `:8080` | TCP address to listen on |
+| `-mode` | `tcp` | Communication protocol: `tcp` or `websocket` |
+| `-addr` | `:8080` | Address to listen on |
 | `-grammar_dir` | `""` | Path to the directory containing grammar binary files (`ddl.bin`, `dml.bin`) |
 | `-max_files_with_states` | `100` | Maximum number of files to keep parser states for |
 | `-max_states_per_file` | `1000` | Maximum number of parser states to keep per file |
+| `-allow_all_origins` | `true` | Allow WebSocket connections from any origin (WebSocket mode only) |
 | `-generate_bin` | `false` | Generate binary grammar files from source grammar and exit |
 
 ### Examples
 
-**deb/rpm install** (grammar files in the default system location):
+**TCP mode** (default):
 
 ```bash
-s2-language-server -addr=:8080 -grammar_dir=/usr/share/s2-language-server/grammar_dir
+s2-language-server -mode=tcp -addr=:8080 -grammar_dir=/usr/share/s2-language-server/grammar_dir
+```
+
+**WebSocket mode**:
+
+```bash
+s2-language-server -mode=websocket -addr=:8080 -grammar_dir=/usr/share/s2-language-server/grammar_dir
 ```
 
 **tar.gz / zip install** (grammar directory next to the binary):
 
 ```bash
-./s2-language-server -addr=:3000 -grammar_dir=./grammar_dir
+./s2-language-server -mode=tcp -addr=:3000 -grammar_dir=./grammar_dir
+```
+
+### Communication Protocols
+
+The server supports two communication protocols:
+
+#### TCP (default)
+
+Direct TCP socket communication. Suitable for local connections and scenarios where a persistent TCP connection is available. This is the default mode.
+
+```bash
+s2-language-server -addr=:8080 -grammar_dir=./grammar_dir
+```
+
+Or explicitly:
+
+```bash
+s2-language-server -mode=tcp -addr=:8080 -grammar_dir=./grammar_dir
+```
+
+#### WebSocket
+
+WebSocket-based communication over HTTP. Useful for browser-based clients, remote connections, or scenarios requiring HTTP transport. The server listens on an HTTP address and upgrades connections to WebSocket on the root path (`/`).
+
+```bash
+s2-language-server -mode=websocket -addr=:8080 -grammar_dir=./grammar_dir
+```
+
+Clients connect to `ws://<host>:8080/` (or `wss://` for secure WebSocket).
+
+By default, the server accepts WebSocket connections from any origin. To restrict connections to same-origin only, use:
+
+```bash
+s2-language-server -mode=websocket -addr=:8080 -allow_all_origins=false -grammar_dir=./grammar_dir
 ```
 
 ### Resource Tuning
