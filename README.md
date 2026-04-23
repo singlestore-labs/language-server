@@ -140,6 +140,8 @@ Provide connection details under `initializationOptions.database`:
 | Database   | `database`   | string  | no       | Default database |
 | SSL        | `ssl`        | boolean | no       | When `true`, the connection will use TLS. Defaults to `false` |
 
+> **Note:** If `initializationOptions.database` is not provided or the connection to the database cannot be established, the language server will still start and operate normally. However, completions based on the actual database schema (tables, columns, procedures, etc.) will not be available. The server will notify the client about the connection issue via a `window/showMessage` warning.
+
 ### Client Information
 
 Provide the name and version of the language client under `initializationOptions.client`:
