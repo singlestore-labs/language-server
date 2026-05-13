@@ -32,6 +32,27 @@ Extracts `s2-language-server` binary and `grammar_dir/` (containing `ddl.bin` an
 
 Extract `s2-language-server_<version>_windows_amd64.zip`. Contains `s2-language-server.exe` and `grammar_dir\` with the grammar binary files.
 
+### Docker
+
+Prebuilt container images are published to GitHub Container Registry. Pull the image with:
+
+```bash
+docker pull ghcr.io/singlestore-labs/language-server
+```
+
+Run the language server in a container, exposing the listening port to the host:
+
+```bash
+docker run --rm -p 8080:8080 ghcr.io/singlestore-labs/language-server
+```
+
+The image ships with the `s2-language-server` binary and the grammar files preinstalled, so no additional setup is required. Flags can be passed after the image name to override defaults — for example, to run in WebSocket mode:
+
+```bash
+docker run --rm -p 8080:8080 ghcr.io/singlestore-labs/language-server \
+  -mode=websocket -addr=:8080
+```
+
 ## Usage
 
 ```bash
@@ -179,5 +200,3 @@ Provide the name and version of the language client under `initializationOptions
   }
 }
 ```
-
-
