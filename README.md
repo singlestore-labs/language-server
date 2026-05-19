@@ -59,7 +59,6 @@ docker run --rm -p 8080:8080 ghcr.io/singlestore-labs/language-server \
 s2-language-server [flags]
 ```
 
-
 ### Flags
 
 | Flag | Default | Description |
