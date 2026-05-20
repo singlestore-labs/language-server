@@ -74,6 +74,7 @@ s2-language-server [flags]
 | `-tls_cert` | `""` | Path to PEM-encoded TLS server certificate (required when `-tls`) |
 | `-tls_key` | `""` | Path to PEM-encoded TLS server private key (required when `-tls`) |
 | `-tls_min_version` | `"1.2"` | Minimum TLS version: `1.2` or `1.3` |
+| `-health_addr` | `"127.0.0.1:8081"` | Address for the plain-HTTP health probe server (`/healthz`). Set to empty (`""`) to disable. See [Health Probe](#health-probe). |
 
 ### Examples
 
@@ -144,6 +145,25 @@ s2-language-server -mode=tcp -addr=:8444 -grammar_dir=./grammar_dir \
 ```
 
 Clients connect to `wss://<host>:8443/` for the WebSocket transport, or use `tls.Dial` (or your language's equivalent) for the TLS-over-TCP transport. The minimum TLS version defaults to 1.2 and can be bumped to 1.3 with `-tls_min_version=1.3`.
+
+### Health Probe
+
+The server provides a plain HTTP health endpoint on a dedicated port for Kubernetes probes and cloud load balancer health checks. This endpoint is independent of the LSP transport: it works the same in both `-mode=tcp` and `-mode=websocket`, with or without `-tls`, and never requires authentication.
+
+```
+GET /healthz   →  200 "ok"           when the LSP listener is accepting connections
+GET /healthz   →  503 "not ready..."   while the listener has not yet started
+```
+
+By default, the health probe server is disabled. To enable it, specify the address to listen on using `-health_addr`. For example, in a containerized environment, bind to all interfaces so that kubelet and cloud load balancers can reach the probe:
+
+```bash
+s2-language-server -health_addr=:8081
+```
+
+In the default Docker image, the readiness probe listens on `127.0.0.1:8081`. Adjust the address as needed for your deployment. To disable the probe server entirely, pass `-health_addr=""`.
+
+The probe handler does not log individual requests—this avoids flooding the LSP log stream with frequent kubelet polls. Probe traffic is always plain HTTP, so certificate rotation on the LSP transport never affects the health endpoint. For a reference Kubernetes deployment (compatible with EKS, GKE, and AKS) that configures `livenessProbe`, `readinessProbe`, and cloud LB health checks at this endpoint, see [`deploy/k8s.yaml`](deploy/k8s.yaml).
 
 ### Resource Tuning
 
