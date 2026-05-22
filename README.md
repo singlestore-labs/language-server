@@ -287,3 +287,45 @@ On success the server stops the previous schema cache updater, opens a fresh con
   }
 }
 ```
+
+### Using the language server for query validation
+
+The language server provides a dedicated method for validating SQL queries without executing them against a live database. This is exposed via the custom LSP request `queryChecker/validateQuery`. Clients can use this method to check the syntax and structure of a query, receive error locations, and get suggestions for valid tokens at the point of failure.
+
+To validate a query, send a JSON-RPC request with the following structure:
+
+```JSON
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "queryChecker/validateQuery",
+  "params": {
+    "databaseVersion": "9.0.30",   // optional: engine version for grammar selection
+    "query": "LOAD DATA CONCURRENT LOCAL FILE 'myfile'" // the SQL query to validate
+  }
+}
+```
+
+The response will indicate whether the query is valid, and if not, will provide the error token, its position, and a list of alternative tokens that would be valid at that point:
+
+```JSON
+{
+  "isValid": false, // indicates wheter the query is grammatically correct
+  "errorTokenPosition": { "line": 0, "character": 27 }, // position of the first incorrect token
+  "errorToken": "FILE", // first incorrect token
+  "alternativeTokens": { // list of alternatives, expected instead of the incorrect tocken
+    "isIncomplete": false,
+    "items": [
+      {
+        "label": "INFILE",
+        ...
+      },
+      ...
+    ]
+  }
+}
+```
+
+If the query is valid, `isValid` will be true and the other fields will be omitted.
+If invalid, `errorToken` and `errorTokenPosition` point to the problematic token, and `alternativeTokens` suggests valid completions.
+This method is useful for editor integrations, CI pipelines, and any tool that needs fast, offline query validation using the same grammar as the language server’s completion engine.
