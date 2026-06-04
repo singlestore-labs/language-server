@@ -69,7 +69,6 @@ s2-language-server [flags]
 | `-max_files_with_states` | `100` | Maximum number of files to keep parser states for |
 | `-max_states_per_file` | `1000` | Maximum number of parser states to keep per file |
 | `-allow_all_origins` | `true` | Allow WebSocket connections from any origin (WebSocket mode only) |
-| `-generate_bin` | `false` | Generate binary grammar files from source grammar and exit |
 | `-tls` | `false` | Enable TLS on the listener (`wss://` for `-mode=websocket`, TLS-over-TCP for `-mode=tcp`) |
 | `-tls_cert` | `""` | Path to PEM-encoded TLS server certificate (required when `-tls`) |
 | `-tls_key` | `""` | Path to PEM-encoded TLS server private key (required when `-tls`) |
