@@ -192,9 +192,13 @@ If no database connection is configured (or the connection fails), the server fa
 ## Official Clients
 
 | Client | Platform | Marketplace | Repository |
-|--------|----------|-------------|------------|
+|---|---|---|---|
 | SingleStore VS Code | VS Code | [Extension](https://marketplace.visualstudio.com/items?itemName=singlestore.singlestore-vscode&ssr=false#overview) | [GitHub](https://github.com/singlestore-labs/singlestore-vscode) |
-| SingleStore Vim | Vim 8+ / Neovim | | [GitHub](https://github.com/singlestore-labs/singlestore-vim) |
+| SingleStore Vim | Vim 8+ / Neovim | — | [GitHub](https://github.com/singlestore-labs/singlestore-vim) |
+| SingleStore JetBrains | JetBrains IDEs [^jb] | [Plugin](https://plugins.jetbrains.com/plugin/32085-singlestore-language-server-client) | [GitHub](https://github.com/singlestore-labs/singlestore-intellij-plugin) |
+
+[^jb]: Supported paid IDEs: IntelliJ IDEA Ultimate, WebStorm, PyCharm Professional, GoLand, CLion, Rider, DataGrip, RubyMine.
+
 
 ## Client Requirements
 
