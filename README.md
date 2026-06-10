@@ -195,6 +195,7 @@ If no database connection is configured (or the connection fails), the server fa
 | SingleStore VS Code | VS Code | [Extension](https://marketplace.visualstudio.com/items?itemName=singlestore.singlestore-vscode&ssr=false#overview) | [GitHub](https://github.com/singlestore-labs/singlestore-vscode) |
 | SingleStore Vim | Vim 8+ / Neovim | — | [GitHub](https://github.com/singlestore-labs/singlestore-vim) |
 | SingleStore JetBrains | JetBrains IDEs [^jb] | | [GitHub](https://github.com/singlestore-labs/singlestore-intellij-plugin) |
+| SingleStore Emacs | Emacs | — | [GitHub](https://github.com/singlestore-labs/singlestore-emacs) |
 
 [^jb]: Supported paid IDEs: IntelliJ IDEA Ultimate, WebStorm, PyCharm Professional, GoLand, CLion, Rider, DataGrip, RubyMine.
 
@@ -261,7 +262,9 @@ Provide the name and version of the language client under `initializationOptions
 
 After initialization, clients can change the database the server is connected to (for example, when a user switches workspaces or rotates credentials) without restarting the language server. Send a [`workspace/didChangeConfiguration`](https://microsoft.github.io/language-server-protocol/specifications/specification-3-14/#workspace_didChangeConfiguration) notification with the updated settings.
 
-The `settings` payload accepts the same `database` block used during initialization, plus an optional `client` block. When `client` is omitted, the server reuses the language client identity supplied in the original `initialize` call. If `database.host` is empty, the notification is ignored.
+The `settings` payload accepts the same `database` block used during initialization, plus an optional `client` block. When `client` is omitted, the server reuses the language client identity supplied in the original `initialize` call. If `database.host` is not set, the language server will only provide grammar-based suggestions without retrieving the actual database schema.
+
+If the notification is sent with an empty `settings` field (missing, `null`, or `{}`), the server ignores it entirely and performs no reconfiguration. This allows clients that broadcast generic `workspace/didChangeConfiguration` events to do so without disrupting the active database connection.
 
 | Settings field | Required | Description |
 |----------------|----------|-------------|
