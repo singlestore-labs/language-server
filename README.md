@@ -1,5 +1,7 @@
 # SingleStore SQL Language Server
 
+*Attention*: The code in this repository is intended for experimental use only and is not fully tested, documented, or supported by SingleStore. Visit the SingleStore Forums to ask questions about this repository.
+
 An LSP server for SingleStore SQL providing context-aware code completion and semantic syntax highlighting. Communicates using JSON-RPC 2.0 over TCP or WebSocket protocols.
 
 ## Installation
