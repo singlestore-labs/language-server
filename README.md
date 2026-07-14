@@ -34,6 +34,14 @@ Extracts `s2-language-server` binary and `grammar_dir/` (containing the default 
 
 Extract `s2-language-server_<version>_windows_amd64.zip`. Contains `s2-language-server.exe` and `grammar_dir\` with the grammar binary files.
 
+The `s2-language-server.exe` binary is code-signed using [Azure Trusted Signing](https://learn.microsoft.com/en-us/azure/trusted-signing/), so Windows SmartScreen and Authenticode consumers can verify its authenticity and integrity. You can inspect the signature via **File → Properties → Digital Signatures** in Windows Explorer, or from PowerShell:
+
+```powershell
+Get-AuthenticodeSignature .\s2-language-server.exe
+```
+
+A valid signature reports `Status : Valid` and lists SingleStore as the signer.
+
 ### Docker
 
 Prebuilt container images are published to GitHub Container Registry. Pull the image with:
@@ -54,6 +62,30 @@ The image ships with the `s2-language-server` binary and the grammar files prein
 docker run --rm -p 8080:8080 ghcr.io/singlestore-labs/language-server \
   -mode=websocket -addr=:8080
 ```
+
+#### Verifying Docker image signatures
+
+All published container images are signed with [Sigstore Cosign](https://docs.sigstore.dev/cosign/overview/) using keyless signing backed by GitHub Actions OIDC. You can verify an image before pulling or running it to make sure it was built and published by this repository's official release workflow.
+
+Install `cosign` (see the [installation guide](https://docs.sigstore.dev/cosign/system_config/installation/)) and then run:
+
+```bash
+cosign verify \
+  --certificate-identity-regexp '^https://github\.com/singlestore/language-server/\.github/workflows/release\.yml@refs/tags/.+$' \
+  --certificate-oidc-issuer 'https://token.actions.githubusercontent.com' \
+  ghcr.io/singlestore-labs/language-server:<tag>
+```
+
+Replace `<tag>` with the specific image tag you want to verify (for example a release version such as `v0.1.11`, or `latest`). To pin verification to an immutable digest instead of a mutable tag, use the `image@sha256:<digest>` form:
+
+```bash
+cosign verify \
+  --certificate-identity-regexp '^https://github\.com/singlestore/language-server/\.github/workflows/release\.yml@refs/tags/.+$' \
+  --certificate-oidc-issuer 'https://token.actions.githubusercontent.com' \
+  ghcr.io/singlestore-labs/language-server@sha256:<digest>
+```
+
+A successful verification prints the signature payloads and exits with status `0`. Any mismatch in the signer identity, OIDC issuer, or signature causes `cosign` to exit non-zero — do not run images that fail verification.
 
 ## Usage
 
@@ -76,6 +108,7 @@ s2-language-server [flags]
 | `-tls_key` | `""` | Path to PEM-encoded TLS server private key (required when `-tls`) |
 | `-tls_min_version` | `"1.2"` | Minimum TLS version: `1.2` or `1.3` |
 | `-health_addr` | `"127.0.0.1:8081"` | Address for the plain-HTTP health probe server (`/healthz`). Set to empty (`""`) to disable. See [Health Probe](#health-probe). |
+| `-schema_update_interval` | `5m` | Interval for updating the schema cache (Go duration, must be > 0; e.g. `30s`, `5m`) |
 
 ### Examples
 
