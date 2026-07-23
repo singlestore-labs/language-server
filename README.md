@@ -351,7 +351,8 @@ The response will indicate whether the query is valid, and if not, will provide 
 
 ```JSON
 {
-  "isValid": false, // indicates wheter the query is grammatically correct
+  "isValid": false, // indicates whether the query is grammatically correct
+  "isComplete": false, // indicates whether the query is terminated and ready to execute (see below)
   "errorTokenPosition": { "line": 0, "character": 27 }, // position of the first incorrect token
   "errorToken": "FILE", // first incorrect token
   "alternativeTokens": { // list of alternatives, expected instead of the incorrect tocken
@@ -367,6 +368,16 @@ The response will indicate whether the query is valid, and if not, will provide 
 }
 ```
 
-If the query is valid, `isValid` will be true and the other fields will be omitted.
+If the query is valid, `isValid` will be true and the other fields, except `isComplete`, will be omitted.
 If invalid, `errorToken` and `errorTokenPosition` point to the problematic token, and `alternativeTokens` suggests valid completions.
+
+#### The `isComplete` field
+
+`isComplete` reports whether the input ends with a query terminator (an end-of-query token such as the `;` delimiter) rather than whether the query is grammatically correct. It is independent of `isValid`, so callers should inspect both flags together:
+
+- `isValid: true, isComplete: true` — the query is grammatically correct and properly terminated; it can be sent to the engine as is.
+- `isValid: true, isComplete: false` — the parsed input is grammatically correct so far, but no terminating delimiter was seen. More tokens may still follow (for example, the user is still typing, or additional clauses are expected before the statement is finished).
+- `isValid: false, isComplete: *` — validation stopped at `errorToken`; `isComplete` then reflects whether the offending token happens to be an end-of-query token, and should generally be treated as "not executable".
+
+
 This method is useful for editor integrations, CI pipelines, and any tool that needs fast, offline query validation using the same grammar as the language server’s completion engine.
